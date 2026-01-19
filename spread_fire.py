@@ -13,32 +13,28 @@ from IPython.display import display, clear_output
 
 def spread_fire(grid):
     """
-    Update rules to match the provided test data:
-    1. Trees (1) become Burning (2) if an orthogonal neighbor is Burning (2).
-    2. Burning cells (2) REMAIN Burning (2).
+    Spreads fire using vectorized NumPy operations.
+    Matches the logic where fire (2) stays fire and spreads to trees (1).
     """
-    # Create a copy so we don't ignite trees and use them to ignite 
-    # other trees in the same time step.
-    update_grid = grid.copy()
-    grid_size = len(grid)
-
-    for i in range(grid_size):
-        for j in range(grid_size):
-            # Only need to check logic for trees (1)
-            if grid[i, j] == 1:
-                # Orthogonal neighbors: Up, Down, Left, Right
-                neighbor_coords = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-                
-                for di, dj in neighbor_coords:
-                    ni, nj = i + di, j + dj
-                    
-                    # Boundary check
-                    if 0 <= ni < grid_size and 0 <= nj < grid_size:
-                        if grid[ni, nj] == 2:
-                            update_grid[i, j] = 2
-                            break 
-                            
-    return update_grid
+    # Create a mask of where the fire currently is
+    is_burning = (grid == 2)
+    
+    # Shift the burning mask to find neighbors of burning cells
+    # This checks Up, Down, Left, and Right (Orthogonal)
+    north = np.roll(is_burning, -1, axis=0); north[-1, :] = False
+    south = np.roll(is_burning, 1, axis=0);  south[0, :] = False
+    east = np.roll(is_burning, -1, axis=1);  east[:, -1] = False
+    west = np.roll(is_burning, 1, axis=1);   west[:, 0] = False
+    
+    # A tree catches fire if it is a tree (1) AND has a burning neighbor
+    neighbors_burning = north | south | east | west
+    new_fire = (grid == 1) & neighbors_burning
+    
+    # Apply changes: Trees that caught fire become 2
+    res_grid = grid.copy()
+    res_grid[new_fire] = 2
+    
+    return res_grid
 grid_size = 30
 p_tree = 0.6  # Probability that a cell contains a tree
 
