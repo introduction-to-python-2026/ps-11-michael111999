@@ -11,4 +11,10 @@ def spread_fire(grid):
                     update_grid[i,j] = 2
 
     return update_grid
+    def initialize_forest(grid_size=30, p_tree=0.6):
+    """Initialize a grid for the forest fire simulation."""
+    grid = np.random.rand(grid_size, grid_size)
+    grid = np.where(grid < p_tree, 1, 0)
+    grid[grid_size // 2][grid_size // 2] = 2
+    return grid
 
