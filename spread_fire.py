@@ -1,3 +1,8 @@
+import numpy as np
+
+# for plots:
+import matplotlib.pyplot as plt
+from IPython.display import display, clear_output
 def spread_fire(grid):
     """Update the forest grid based on fire spreading rules."""
     update_grid = grid.copy()
