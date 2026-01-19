@@ -10,38 +10,33 @@ from IPython.display import display, clear_output
     grid[grid_size // 2][grid_size // 2] = 2
     return grid
     # Set up the grid
-import numpy as np
 
 def spread_fire(grid):
     """
-    Update the forest grid based on standard fire spreading rules.
-    0: Empty/Ash
-    1: Tree
-    2: Burning
+    Update rules to match the provided test data:
+    1. Trees (1) become Burning (2) if an orthogonal neighbor is Burning (2).
+    2. Burning cells (2) REMAIN Burning (2).
     """
-    # We must work on a copy to ensure 'simultaneous' updates
+    # Create a copy so we don't ignite trees and use them to ignite 
+    # other trees in the same time step.
     update_grid = grid.copy()
     grid_size = len(grid)
 
     for i in range(grid_size):
         for j in range(grid_size):
-            # Rule: If the cell is currently burning, it becomes ash (0)
-            if grid[i, j] == 2:
-                update_grid[i, j] = 0
-            
-            # Rule: If the cell is a tree, check if any neighbor is burning
-            elif grid[i, j] == 1:
+            # Only need to check logic for trees (1)
+            if grid[i, j] == 1:
                 # Orthogonal neighbors: Up, Down, Left, Right
                 neighbor_coords = [(-1, 0), (1, 0), (0, -1), (0, 1)]
                 
                 for di, dj in neighbor_coords:
                     ni, nj = i + di, j + dj
                     
-                    # Check boundary conditions
+                    # Boundary check
                     if 0 <= ni < grid_size and 0 <= nj < grid_size:
                         if grid[ni, nj] == 2:
                             update_grid[i, j] = 2
-                            break # Move to next cell once ignited
+                            break 
                             
     return update_grid
 grid_size = 30
